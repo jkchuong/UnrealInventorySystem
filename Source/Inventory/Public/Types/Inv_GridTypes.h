@@ -25,7 +25,7 @@ struct FInv_SlotAvailability
 	FInv_SlotAvailability(const int32 ItemIndex, const int32 Room, const bool bHasItem)
 		: Index(ItemIndex)
 		, AmountToFill(Room)
-		, bItemAtindex(bHasItem)
+		, bItemAtIndex(bHasItem)
 	{ }
 
 	/** Index of the slot */
@@ -35,7 +35,7 @@ struct FInv_SlotAvailability
 	int32 AmountToFill = 0;
 	
 	/** Is there an item at this index */
-	bool bItemAtindex = false;
+	bool bItemAtIndex = false;
 };
 
 USTRUCT()
