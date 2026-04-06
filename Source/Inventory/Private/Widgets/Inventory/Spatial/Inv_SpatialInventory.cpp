@@ -3,8 +3,11 @@
 
 #include "Widgets/Inventory/Spatial/Inv_SpatialInventory.h"
 
+#include "InventoryLogs.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
+#include "InventoryManagement/Utils/Inv_InventoryStatics.h"
+#include "Items/Components/Inv_ItemComponent.h"
 #include "Widgets/Inventory/Spatial/Inv_InventoryGrid.h"
 
 void UInv_SpatialInventory::NativeOnInitialized()
@@ -20,8 +23,23 @@ void UInv_SpatialInventory::NativeOnInitialized()
 
 FInv_SlotAvailabilityResult UInv_SpatialInventory::HasRoomForItem(UInv_ItemComponent* ItemComponent) const
 {
-	FInv_SlotAvailabilityResult Result;
-	return Result;
+	switch (UInv_InventoryStatics::GetItemCategoryFromItemComponent(ItemComponent))
+	{
+	case EInv_ItemCategory::Equippable:
+		return Grid_Equippables->HasRoomForItem(ItemComponent);
+		
+	case EInv_ItemCategory::Consumable:
+		return Grid_Consumables->HasRoomForItem(ItemComponent);
+		
+	case EInv_ItemCategory::Craftable:
+		return Grid_Craftables->HasRoomForItem(ItemComponent);
+		
+	case EInv_ItemCategory::None:
+	default:
+		UE_LOG(LogInventory, Error, TEXT("Item Component in Actor [%s] does not have a valid Item Category"),
+			ItemComponent ? *ItemComponent->GetOwner()->GetName() : TEXT("None"));
+		return FInv_SlotAvailabilityResult();
+	}
 }
 
 void UInv_SpatialInventory::ShowEquippables()
