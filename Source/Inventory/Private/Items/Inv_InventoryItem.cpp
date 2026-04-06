@@ -16,3 +16,13 @@ void UInv_InventoryItem::SetItemManifest(const FInv_ItemManifest& Manifest)
 {
 	ItemManifest = FInstancedStruct::Make<FInv_ItemManifest>(Manifest);
 }
+
+const FInv_ItemManifest& UInv_InventoryItem::GetItemManifest() const
+{
+	return ItemManifest.Get<FInv_ItemManifest>();
+}
+
+FInv_ItemManifest& UInv_InventoryItem::GetItemManifestMutable()
+{
+	return ItemManifest.GetMutable<FInv_ItemManifest>();
+}

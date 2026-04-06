@@ -7,6 +7,7 @@
 #include "Widgets/Inventory/InventoryBase/Inv_InventoryBase.h"
 
 UInv_InventoryComponent::UInv_InventoryComponent()
+	: InventoryList(this)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	
@@ -49,6 +50,11 @@ void UInv_InventoryComponent::Server_AddNewItem_Implementation(UInv_ItemComponen
 {
 	UInv_InventoryItem* NewItem = InventoryList.AddEntry(ItemComponent);
 	
+	if (GetOwner()->GetNetMode() == NM_ListenServer || GetOwner()->GetNetMode() == NM_Standalone)
+	{
+		OnItemAdded.Broadcast(NewItem);
+	}
+	
 	// TODO: Tell item component to destroy its owning actor
 }
 
@@ -68,7 +74,7 @@ void UInv_InventoryComponent::ToggleInventoryMenu()
 	}
 }
 
-void UInv_InventoryComponent::AddReplicatedSubObject(UObject* SubObj)
+void UInv_InventoryComponent::AddRepSubObj(UObject* SubObj)
 {
 	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && IsValid(SubObj))
 	{

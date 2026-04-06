@@ -19,9 +19,12 @@ class INVENTORY_API UInv_InventoryItem : public UObject
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual bool IsSupportedForNetworking() const override { return true; } // Allows this object to be added to a replicated subobject list
 	
 	void SetItemManifest(const FInv_ItemManifest& Manifest);
-	
+	const FInv_ItemManifest& GetItemManifest() const;
+	FInv_ItemManifest& GetItemManifestMutable();
+
 private:
 	UPROPERTY(VisibleAnywhere, meta=(BaseStruct = "/Script/Inventory.Inv_ItemManifest"), Replicated, Category = "Inventory")
 	FInstancedStruct ItemManifest;

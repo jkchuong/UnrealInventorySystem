@@ -6,6 +6,9 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
+#include "InventoryManagement/Components/Inv_InventoryComponent.h"
+#include "InventoryManagement/Utils/Inv_InventoryStatics.h"
+#include "Items/Inv_InventoryItem.h"
 #include "Widgets/Inventory/GridSlots/Inv_GridSlot.h"
 #include "Widgets/Utils/Inv_WidgetUtils.h"
 
@@ -14,6 +17,23 @@ void UInv_InventoryGrid::NativeOnInitialized()
 	Super::NativeOnInitialized();
 	
 	ConstructGrid();
+	
+	InventoryComponent = UInv_InventoryStatics::GetInventoryComponent(GetOwningPlayer());
+	if (InventoryComponent.IsValid())
+	{
+		InventoryComponent->OnItemAdded.AddDynamic(this, &UInv_InventoryGrid::AddItem);
+	}
+}
+
+void UInv_InventoryGrid::AddItem(UInv_InventoryItem* Item)
+{
+	if (!MatchesCategory(Item))
+	{
+		return;
+	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("Inventory Grid Add Item"));
+	// TODO: Add item to grid
 }
 
 void UInv_InventoryGrid::ConstructGrid()
@@ -37,4 +57,14 @@ void UInv_InventoryGrid::ConstructGrid()
 			GridSlots.Add(GridSlot);
 		}
 	}
+}
+
+bool UInv_InventoryGrid::MatchesCategory(const UInv_InventoryItem* Item) const
+{
+	if (Item)
+	{
+		return Item->GetItemManifest().GetItemCategory() == ItemCategory;
+	}
+	
+	return false;
 }

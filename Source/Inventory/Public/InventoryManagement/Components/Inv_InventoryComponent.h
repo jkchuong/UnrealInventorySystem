@@ -36,7 +36,7 @@ public:
 	
 	void ToggleInventoryMenu();
 	
-	void AddReplicatedSubObject(UObject* SubObj);
+	void AddRepSubObj(UObject* SubObj);
 	
 	FInventoryItemChange OnItemAdded;
 	FInventoryItemChange OnItemRemoved;
