@@ -9,6 +9,7 @@
 
 #include "Inv_ItemManifest.generated.h"
 
+struct FInv_ItemFragment;
 enum class EInv_ItemCategory : uint8;
 class UInv_InventoryItem;
 
@@ -31,4 +32,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Inventory", meta=(Categories="GameItems"))
 	FGameplayTag ItemType;
 	
+	/** The fragments that make up this item */
+	UPROPERTY(EditAnywhere, Category = "Inventory", meta=(ExcludeBaseStruct))
+	TArray<TInstancedStruct<FInv_ItemFragment>> Fragments;
 };
