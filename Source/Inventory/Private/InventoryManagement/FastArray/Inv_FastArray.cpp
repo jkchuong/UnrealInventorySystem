@@ -46,7 +46,21 @@ void FInv_InventoryFastArray::PostReplicatedAdd(const TArrayView<int32> AddedInd
 
 UInv_InventoryItem* FInv_InventoryFastArray::AddEntry(UInv_ItemComponent* ItemComponent)
 {
-	// TODO: After implementing Item Component
+	check(OwnerComponent);
+	AActor* OwningActor = OwnerComponent->GetOwner();
+	check(OwningActor->HasAuthority());
+	
+	if (UInv_InventoryComponent* InventoryComponent = Cast<UInv_InventoryComponent>(OwnerComponent))
+	{
+		FInv_InventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
+		NewEntry.Item = ItemComponent->GetItemManifest().Manifest(OwningActor);
+		
+		InventoryComponent->AddReplicatedSubObject(NewEntry.Item);
+		MarkItemDirty(NewEntry);
+		
+		return NewEntry.Item;
+	}
+	
 	return nullptr;
 }
 
