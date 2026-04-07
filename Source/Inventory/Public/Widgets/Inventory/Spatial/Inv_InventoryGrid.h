@@ -35,7 +35,7 @@ public:
 private:
 	
 	void ConstructGrid();
-	void AddItemToIndices(const FInv_SlotAvailabilityResult& Result, UInv_InventoryItem* NewItem) const;
+	void AddItemToIndices(const FInv_SlotAvailabilityResult& Result, UInv_InventoryItem* NewItem);
 	bool MatchesCategory(const UInv_InventoryItem* Item) const;
 	
 	/** Calls the HasRoomForItem on Item Manifest */
@@ -46,9 +46,10 @@ private:
 	
 	FVector2D GetDrawSize(const FInv_GridFragment* GridFragment) const;
 	void SetSlottedItemImage(const UInv_SlottedItem* SlottedItem, const FInv_GridFragment* GridFragment, const FInv_ImageFragment* ImageFragment) const;
-	void CreateSlottedItem(UInv_InventoryItem* NewItem, const FInv_SlotAvailability& Availability,
-	                       const FInv_GridFragment* GridFragment, const FInv_ImageFragment* ImageFragment) const;
-	void AddItemAtIndex(UInv_InventoryItem* NewItem, const FInv_SlotAvailability& Availability, bool bStackable) const;
+	UInv_SlottedItem* CreateSlottedItem(UInv_InventoryItem* NewItem, const FInv_SlotAvailability& Availability, const FInv_GridFragment* GridFragment,
+	                                    const FInv_ImageFragment* ImageFragment) const;
+	void AddItemAtIndex(UInv_InventoryItem* NewItem, const FInv_SlotAvailability& Availability, bool bStackable);
+	void AddSlottedItemToCanvas(const int32 Index, const FInv_GridFragment* GridFragment, UInv_SlottedItem* SlottedItem) const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess="true"), Category = "Inventory")
 	EInv_ItemCategory ItemCategory;
@@ -64,6 +65,9 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TSubclassOf<UInv_SlottedItem> SlottedItemClass;
+	
+	UPROPERTY()
+	TMap<int32, TObjectPtr<UInv_SlottedItem>> SlottedItems;
 	
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	int32 Rows;

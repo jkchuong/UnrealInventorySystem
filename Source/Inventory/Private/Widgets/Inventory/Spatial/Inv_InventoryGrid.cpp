@@ -122,16 +122,18 @@ void UInv_InventoryGrid::SetSlottedItemImage(const UInv_SlottedItem* SlottedItem
 	SlottedItem->SetImageBrush(Brush);
 }
 
-void UInv_InventoryGrid::CreateSlottedItem(UInv_InventoryItem* NewItem, const FInv_SlotAvailability& Availability, const FInv_GridFragment* GridFragment, const FInv_ImageFragment* ImageFragment) const
+UInv_SlottedItem* UInv_InventoryGrid::CreateSlottedItem(UInv_InventoryItem* NewItem, const FInv_SlotAvailability& Availability,
+                                                        const FInv_GridFragment* GridFragment, const FInv_ImageFragment* ImageFragment) const
 {
 	UInv_SlottedItem* SlottedItem = CreateWidget<UInv_SlottedItem>(GetOwningPlayer(), SlottedItemClass);
 	check(SlottedItem);
 	SlottedItem->SetInventoryItem(NewItem);
 	SetSlottedItemImage(SlottedItem, GridFragment, ImageFragment);
 	SlottedItem->SetGridIndex(Availability.Index);
+	return SlottedItem;
 }
 
-void UInv_InventoryGrid::AddItemAtIndex(UInv_InventoryItem* NewItem, const FInv_SlotAvailability& Availability, const bool bStackable) const
+void UInv_InventoryGrid::AddItemAtIndex(UInv_InventoryItem* NewItem, const FInv_SlotAvailability& Availability, const bool bStackable)
 {
 	const FInv_GridFragment* GridFragment = GetFragment<FInv_GridFragment>(NewItem, Fragments::GridFragment);
 	const FInv_ImageFragment* ImageFragment = GetFragment<FInv_ImageFragment>(NewItem, Fragments::ImageFragment);
@@ -140,18 +142,26 @@ void UInv_InventoryGrid::AddItemAtIndex(UInv_InventoryItem* NewItem, const FInv_
 	{
 		return;
 	}
-		
-	CreateSlottedItem(NewItem, Availability, GridFragment, ImageFragment);
+
+	UInv_SlottedItem* SlottedItem = CreateSlottedItem(NewItem, Availability, GridFragment, ImageFragment);
+	AddSlottedItemToCanvas(Availability.Index, GridFragment, SlottedItem);
+	SlottedItems.Add(Availability.Index, SlottedItem);
 }
 
-void UInv_InventoryGrid::AddItemToIndices(const FInv_SlotAvailabilityResult& Result, UInv_InventoryItem* NewItem) const
+void UInv_InventoryGrid::AddSlottedItemToCanvas(const int32 Index, const FInv_GridFragment* GridFragment, UInv_SlottedItem* SlottedItem) const
 {
-	for (const auto& Availability : Result.SlotAvailabilities)
+	CanvasPanel->AddChildToCanvas(SlottedItem);
+	UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(SlottedItem);
+	CanvasSlot->SetSize(GetDrawSize(GridFragment));
+	const FVector2D DrawPos = UInv_WidgetUtils::GetPositionFromIndex(Index, Columns) * TileSize;
+	const FVector2D DrawPosWithPadding = DrawPos + FVector2D(GridFragment->GetGridPadding());
+	CanvasSlot->SetPosition(DrawPosWithPadding);
+}
+
+void UInv_InventoryGrid::AddItemToIndices(const FInv_SlotAvailabilityResult& Result, UInv_InventoryItem* NewItem)
+{
+	for (const FInv_SlotAvailability& Availability : Result.SlotAvailabilities)
 	{
 		AddItemAtIndex(NewItem, Availability, Result.bStackable);
 	}
-	
-	// Add the slotted item to canvas panel
-	
-	// Store the new widget in a container
 }
