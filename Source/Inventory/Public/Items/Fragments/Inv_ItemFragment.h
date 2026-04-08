@@ -66,3 +66,22 @@ private:
 	FVector2D IconDimensions = FVector2D(44.f, 44.f);
 };
 
+USTRUCT(BlueprintType, DisplayName = "Stackable Fragment")
+struct FInv_StackableFragment : public FInv_ItemFragment
+{
+	GENERATED_BODY()
+	
+	FInv_StackableFragment() { SetFragmentTag(Fragments::StackableFragment); }
+	
+	int32 GetMaxStackSize() const { return MaxStackSize; }
+	int32 GetStackCount() const { return StackCount; }
+	
+private:
+	/** Max Stacks size in inventory */
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	int32 MaxStackSize = 1;
+	
+	/** How many of this item in the pickup object */
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	int32 StackCount = 1;
+};
