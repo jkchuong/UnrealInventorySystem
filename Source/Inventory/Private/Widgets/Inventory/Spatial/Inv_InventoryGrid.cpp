@@ -95,13 +95,19 @@ FInv_SlotAvailabilityResult UInv_InventoryGrid::HasRoomForItem(const UInv_Invent
 FInv_SlotAvailabilityResult UInv_InventoryGrid::HasRoomForItem(const FInv_ItemManifest& ItemManifest)
 {
 	FInv_SlotAvailabilityResult Result;
-	Result.TotalRoomToFill = 1;
+	Result.TotalRoomToFill = 7;
+	Result.bStackable = true;
 	
 	FInv_SlotAvailability SlotAvailability;
-	SlotAvailability.AmountToFill = 1;
+	SlotAvailability.AmountToFill = 2;
 	SlotAvailability.Index = 0;
 	
+	FInv_SlotAvailability SlotAvailability2;
+	SlotAvailability2.AmountToFill = 5;
+	SlotAvailability2.Index = 1;
+	
 	Result.SlotAvailabilities.Add(MoveTemp(SlotAvailability));
+	Result.SlotAvailabilities.Add(MoveTemp(SlotAvailability2));
 	
 	return Result;
 }
@@ -123,13 +129,16 @@ void UInv_InventoryGrid::SetSlottedItemImage(const UInv_SlottedItem* SlottedItem
 }
 
 UInv_SlottedItem* UInv_InventoryGrid::CreateSlottedItem(UInv_InventoryItem* NewItem, const FInv_SlotAvailability& Availability,
-                                                        const FInv_GridFragment* GridFragment, const FInv_ImageFragment* ImageFragment) const
+                                                        const FInv_GridFragment* GridFragment, const FInv_ImageFragment* ImageFragment, bool bStackable) const
 {
 	UInv_SlottedItem* SlottedItem = CreateWidget<UInv_SlottedItem>(GetOwningPlayer(), SlottedItemClass);
 	check(SlottedItem);
 	SlottedItem->SetInventoryItem(NewItem);
 	SetSlottedItemImage(SlottedItem, GridFragment, ImageFragment);
 	SlottedItem->SetGridIndex(Availability.Index);
+	SlottedItem->SetIsStackable(bStackable);
+	const int32 StackUpdateAmount = bStackable ? Availability.AmountToFill : 0;
+	SlottedItem->UpdateStackCount(StackUpdateAmount);
 	return SlottedItem;
 }
 
@@ -143,7 +152,7 @@ void UInv_InventoryGrid::AddItemAtIndex(UInv_InventoryItem* NewItem, const FInv_
 		return;
 	}
 
-	UInv_SlottedItem* SlottedItem = CreateSlottedItem(NewItem, Availability, GridFragment, ImageFragment);
+	UInv_SlottedItem* SlottedItem = CreateSlottedItem(NewItem, Availability, GridFragment, ImageFragment, bStackable);
 	AddSlottedItemToCanvas(Availability.Index, GridFragment, SlottedItem);
 	SlottedItems.Add(Availability.Index, SlottedItem);
 }

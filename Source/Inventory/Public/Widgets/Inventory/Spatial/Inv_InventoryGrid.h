@@ -47,7 +47,7 @@ private:
 	FVector2D GetDrawSize(const FInv_GridFragment* GridFragment) const;
 	void SetSlottedItemImage(const UInv_SlottedItem* SlottedItem, const FInv_GridFragment* GridFragment, const FInv_ImageFragment* ImageFragment) const;
 	UInv_SlottedItem* CreateSlottedItem(UInv_InventoryItem* NewItem, const FInv_SlotAvailability& Availability, const FInv_GridFragment* GridFragment,
-	                                    const FInv_ImageFragment* ImageFragment) const;
+	                                    const FInv_ImageFragment* ImageFragment, bool bStackable) const;
 	void AddItemAtIndex(UInv_InventoryItem* NewItem, const FInv_SlotAvailability& Availability, bool bStackable);
 	void AddSlottedItemToCanvas(const int32 Index, const FInv_GridFragment* GridFragment, UInv_SlottedItem* SlottedItem) const;
 	void UpdateGridSlots(UInv_InventoryItem* NewItem, const int32 Index);
